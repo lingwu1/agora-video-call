@@ -36,3 +36,20 @@
     transform: rotate(360deg);
   }
 }
+
+.in-middle {
+  /* position: absolute; */
+  text-align: center;
+  /* top: 50%;
+  left: 40%;
+  margin-top: -20px;
+  margin-left: -125px; */
+}
+
+.pd-tp {
+  padding-top: 30px;
+}
+
+.video-img{
+  background-color: gray;
+}

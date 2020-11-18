@@ -4,14 +4,17 @@ import AgoraRTC from "agora-rtc-sdk-ng";
 import Button from '@material-ui/core/Button/Button';
 import { rtc , options} from './context/constant';
 import "./App.css";
+import { AppBar, makeStyles, TextField, Toolbar, Typography } from '@material-ui/core';
 
 
 function App() {
   const handleJoin = async () => {
     try{
+      setJoin(true);
     console.log("Joining")
     rtc.client = AgoraRTC.createClient({ mode: "rtc", codec: "h264" });
-    const uid = await rtc.client.join(options.appId, options.channel, options.token, null);
+
+    const uid = await rtc.client.join(values.appId, values.channel, values.token, null);
     
     rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
     rtc.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
@@ -61,6 +64,7 @@ function App() {
 
   const handleLeave = async () => {
     try{
+      setJoin(false)
       const localContainer:any = document.getElementById("local-stream");
 
       localContainer.textContent = "";
@@ -79,20 +83,71 @@ function App() {
     }
   }
 
+  const useStyles = makeStyles({
+    root: {
+        border: 0,
+        borderRadius: 0,
+        backgroundColor: '#3f51b5',
+        color: 'white',
+        width: "250px",
+        marginTop: "30px"
+    },
+});
+
+const classes = useStyles(); 
+
+const useStyles2 = makeStyles((theme) => ({
+  root: {
+    '& > *': {
+      margin: theme.spacing(1),
+      width: '50ch',
+    },
+  },
+}));
+
+const classes2 = useStyles2();
+const [values, setValues] = React.useState({
+  appId: '',
+  channel: '',
+  token: ''
+});
+const [join,setJoin] = useState(false);
+
+const handleChangeForm = (name:any) => (event:any) => {
+  setValues({ ...values, [name]: event.target.value });
+};
+
   return(
     <div>
-      <div>
-        <Button color="primary" onClick={handleJoin}>Join</Button>
-        <Button color="primary" onClick={handleLeave}>Leave</Button>
-      </div>
-      <>
-        <div id="local-stream" className="stream local-stream"></div>
-          <div
-            id="remote-stream"
-            className="stream remote-stream"
-        ></div>
-        </>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography>Agora Video Call</Typography>
+        </Toolbar>
+      </AppBar>
+      <div className="in-middle">
+        {join?
+           <div> 
+              <div className="stream-display">
+                  <div id="local-stream" className="stream local-stream"></div>
+                  <div id="remote-stream" className="stream remote-stream"></div>
+              </div>
+              <Button variant="contained" className={classes.root} onClick={handleLeave}>Leave Channel</Button>
+              <div/></div> :         
+              <div>
+                <div>
+                  <h4 className="pd-tp">Join a channel with <b>appId</b></h4>
+                  <img className="video-img" src="/meeting.png" alt="video"></img>
+                  </div>
+                  <form className={classes2.root} noValidate autoComplete="no">
+                    <TextField id="standard-basic" value={values.appId} onChange={handleChangeForm("appId")} label="appId" />
+                      <TextField id="standard-basic" value={values.channel} onChange={handleChangeForm("channel")} label="channel name" />
+                      <TextField id="standard-basic" value={values.token} onChange={handleChangeForm("token")} label="token" />
+                    </form>
+                  <Button variant="contained" className={classes.root} onClick={handleJoin}>Join Channel</Button>
+                  </div>
+        }
     </div>
+  </div>
   )
 }
 
